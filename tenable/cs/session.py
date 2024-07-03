@@ -25,8 +25,8 @@ from .exports.api import ExportsAPI
 
 class TenableCS(APIPlatform):
     """
-    The Tenable OT Security object is the primary interaction point for users
-    to interface with Tenable.OT via the pyTenable library.  All the API
+    The Tenable Cloud Security object is the primary interaction point for users
+    to interface with TCS via the pyTenable library.  All the API
     endpoint classes that have been written will be grafted onto this class.
 
     Args:
@@ -47,14 +47,14 @@ class TenableCS(APIPlatform):
     Examples:
         Basic Example:
 
-        >>> from tenable.ot import TenableOT
-        >>> ot = TenableOT(api_key='SECRET_KEY',
-        ..                 url='https://ot.example.com')
+        >>> from tenable.cs import TenableCS
+        >>> cs = TenableCS(api_key='SECRET_KEY',
+        ..                 url='https://us2.app.ermetic.com/')
 
         Example with proper identification:
 
-        >>> ot = TenableOT(api_key='SECRET_KEY',
-        ...                url='https://ot.example.com',
+        >>> cs = TenableCS(api_key='SECRET_KEY',
+        ...                url='https://us2.app.ermetic.com/',
         ...                vendor='Company Name',
         ...                product='My Awesome Widget',
         ...                build='1.0.0')
@@ -99,8 +99,9 @@ class TenableCS(APIPlatform):
                 The key/values that should be passed to the body of the GraphQL
                 request.
 
+        #TODO make simple real query example
         Example:
-            >>> ot.graphql(
+            >>> cs.graphql(
             ...     variables={'asset': 'b64 id string'},
             ...     query=\'\'\'
             ...         query getAssetDetails($asset: ID!) {

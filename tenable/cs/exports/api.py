@@ -29,13 +29,13 @@ class ExportsAPI(APIEndpoint):
                 The number of objects to be returned per page.
             start_at (str, optional):
                 Start returning data after this object id.
-            filters (list[dict], optional):
+            filters (dict, optional):
                 List of filters to apply to restict the response to only the
                 desired items.
             return_json (bool, optional):
                 If `True`, then the instead of an iterator, the json response
                 will be returned instead.
-            default_filters (list[dict], optional):
+            default_filters (dict, optional):
                 The default filters to appllied to the query first.  This is
                 mainly used by the caller as part of passing through the
                 filters parameter as well.
@@ -43,7 +43,7 @@ class ExportsAPI(APIEndpoint):
                 The iterable object to return to the caller.
 
         Returns:
-            Union[OTExportsIterator, dict]:
+            Union[CloudSecExportIterator, dict]:
                 By default the method will return an iterator that will handle
                 pagination and return a single item at a time.  If return_json
                 is set to `True` however, then the JSON response will be
