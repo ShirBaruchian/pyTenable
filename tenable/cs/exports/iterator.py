@@ -16,7 +16,7 @@ class CloudSecExportIterator(APIIterator):
         """
         resp = self._api.graphql(query=self._query,
                                  variables=self._variables,
-                                 )
+                                 ).json()
         raw_page = resp.get('data', {}).get(self._model, {})
         self.page = raw_page.get('nodes', [])
         self._variables['startAt'] = raw_page.get('pageInfo', {})\

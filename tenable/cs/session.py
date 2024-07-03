@@ -114,7 +114,7 @@ class TenableCS(APIPlatform):
             ...         }
             ... \'\'\')
         """
-        return self.post("graphql", json=kwargs)
+        return self.post("graph", json=kwargs)
 
     @property
     def exports(self):

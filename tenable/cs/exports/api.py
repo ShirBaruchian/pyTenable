@@ -10,8 +10,8 @@ class ExportsAPI(APIEndpoint):
               model: str,
               limit: int = 200,
               return_json: bool = False,
-              filters: Optional[List[Dict]] = None,
-              default_filters: Optional[List[Dict]] = None,
+              filters: Optional[Dict] = None,
+              default_filters: Optional[Dict] = None,
               start_at: Optional[str] = None,
               iterable: Optional[Any] = CloudSecExportIterator,
               **kwargs
@@ -49,28 +49,30 @@ class ExportsAPI(APIEndpoint):
                 is set to `True` however, then the JSON response will be
                 returned instead for that page.
         """
-        default_filters = [] if default_filters is None else default_filters
-        filters = [] if filters is None else filters
+        default_filters = {} if default_filters is None else default_filters
+        filters = {} if filters is None else filters
 
         # Iterate over the default filters and add them to the filter list
         # if they don't exist.
         for default_filter in default_filters:
-            field = default_filter['field']
-            if field not in [f.get('field') for f in filters]:
-                filters.append(default_filter)
-
-        filter = filters[0] if filters else None
-        if len(filters) > 1:
-            filter = {
-                'op': 'And',
-                'expressions': filters
-            }
-
+            if default_filter not in filters:
+                filters[default_filter] = default_filters[default_filter]
         variables = {
             'startAt': start_at,
             'limit': limit,
-            'filter': filter,
+            'filter': filters,
         }
+        if return_json:
+            return self._api.query(query=query,
+                                   variables=variables,
+                                   **kwargs
+                                   )
+        return iterable(self._api,
+                        _model=model,
+                        _query=query,
+                        _variables=variables,
+                        **kwargs
+                        )
 
     def compute_vulns(self,
                       filters: Optional[Dict] = None,
@@ -87,7 +89,98 @@ class ExportsAPI(APIEndpoint):
         return self._list(queries.COMPUTE_VULNS_QUERY,
                           model='VirtualMachines',
                           filters=filters,
+                          default_filters=default_filters,
                           start_at=start_at,
                           limit=limit,
                           return_json=return_json
                           )
+        
+    def container_vulns(self,
+                      filters: Optional[Dict] = None,
+                      start_at: Optional[str] = None,
+                      limit: Optional[int] = 200,
+                      return_json: bool = False
+                      ) -> Union[CloudSecExportIterator, Dict]:
+        """
+        No docs for you
+        """
+        default_filters = {
+            'VulnerabilitySeverities': ['Critical', 'High', 'Medium', 'Low', 'Informational'],
+        }
+        return self._list(queries.CONTAINER_VULNS_QUERY,
+                          model='ContainerImages',
+                          filters=filters,
+                          start_at=start_at,
+                          default_filters=default_filters,
+                          limit=limit,
+                          return_json=return_json
+                          )
+        
+    def compute_assets(self,
+                    filters: Optional[Dict] = None,
+                    start_at: Optional[str] = None,
+                    limit: Optional[int] = 200,
+                    return_json: bool = False
+                    ) -> Union[CloudSecExportIterator, Dict]:
+        """
+        No docs for you
+        """
+        self._log.warn('The query that powers this only supports ec2 right now')
+        default_filters = {
+            'Types': [
+                'AzureDbForMariaDbServer',
+                'AwsRdsDatabaseInstance',
+                'AwsEc2Instance',
+                'AzureComputeVirtualMachine',
+                'AzureComputeVirtualMachineScaleSetVirtualMachine',
+                'GcpComputeInstance',
+                'AwsRdsDatabaseInstance',
+                'AzureClassicComputeVirtualMachine',
+                'AzureVMwareVirtualmachine',
+                'GcpSpannerDatabase',
+                'OciComputeInstance',
+                'AzureMySqlFlexibleServer',
+                'AzureMySqlSingleServer',
+                'AzurePostgreSqlFlexibleServer',
+                'AzurePostgreSqlSingleServer',
+                'AzureSqlServer',
+                'GcpSqlInstance',
+                'GcpBigtableInstance'
+            ]
+        }
+
+        return self._list(queries.COMPUTE_ASSETS_QUERY,
+                            model='Entities',
+                            filters=filters,
+                            default_filters=default_filters,
+                            start_at=start_at,
+                            limit=limit,
+                            return_json=return_json
+                        )
+        
+    def container_assets(self,
+                    filters: Optional[Dict] = None,
+                    start_at: Optional[str] = None,
+                    limit: Optional[int] = 200,
+                    return_json: bool = False
+                    ) -> Union[CloudSecExportIterator, Dict]:
+        """
+        No docs for you
+        """
+        default_filters = {
+            'Types': [
+                'CiContainerImage',
+                'AwsContainerImage',
+                'AzureContainerImage',
+                'GcpContainerImage',
+                'OpContainerImage'
+            ]
+        }
+        return self._list(queries.CONTAINER_ASSETS_QUERY,
+                            model='Entities',
+                            filters=filters,
+                            default_filters=default_filters,
+                            start_at=start_at,
+                            limit=limit,
+                            return_json=return_json
+                        )
