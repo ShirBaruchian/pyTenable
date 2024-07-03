@@ -1,10 +1,10 @@
 """
-Tenable OT Security
-==========
+Tenable Cloud Security
+===================
 
-This package covers the Tenable OT Security interface.
+This package covers the Tenable Cloud Security interface.
 
-.. autoclass:: TenableOT
+.. autoclass:: TenableCS
     :members:
 
 
@@ -12,9 +12,7 @@ This package covers the Tenable OT Security interface.
     :hidden:
     :glob:
 
-    assets
-    events
-    plugins
+    exports
 """
 import os
 import warnings

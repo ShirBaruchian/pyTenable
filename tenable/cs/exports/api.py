@@ -1,8 +1,21 @@
+"""
+Data Export Helper
+==================
+
+The methods exposed within the export module are designed to mimick the same
+structure that Tenable Vulnerability Management uses for exporting data.
+These methods ultimately translate to GraphQL queries and then are fed to the
+Tenable CS API.
+
+.. rst-class:: hide-signature
+.. autoclass:: ExportsAPI
+    :members:
+"""
+
 from typing import List, Dict, Optional, Union, Any
 from tenable.base.endpoint import APIEndpoint
-from .iterator import CloudSecExportIterator
-from . import queries
-
+from tenable.cs.exports.iterator import CloudSecExportIterator
+from tenable.cs.exports import queries
 
 class ExportsAPI(APIEndpoint):
     def _list(self,
