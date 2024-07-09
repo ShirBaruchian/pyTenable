@@ -96,19 +96,20 @@ class TenableCS(APIPlatform):
             **kwargs (dict, optional):
                 The key/values that should be passed to the body of the GraphQL
                 request.
-
-        #TODO make simple real query example
+                
         Example:
             >>> cs.graphql(
-            ...     variables={'asset': 'b64 id string'},
+            ...     variables={'limit': 1,'filter': {'VulnerabilitySeverities': 
+            ...               ['Critical']}}
             ...     query=\'\'\'
-            ...         query getAssetDetails($asset: ID!) {
-            ...             asset(id: $asset) {
-            ...                 id
-            ...                 type
-            ...                 name
-            ...                 criticality
-            ...                 location
+            ...         query getComputeVulns($filter: VirtualMachinesFilterInput, $limit: Int) {
+            ...             VirtualMachines(first: $limit, filter: $filter) {
+            ...                 nodes {
+            ...                     Id
+            ...                     AccountId
+            ...                     CloudProvider
+            ...                     OperatingSystem
+            ...                 }
             ...             }
             ...         }
             ... \'\'\')
