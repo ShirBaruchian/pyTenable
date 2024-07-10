@@ -1,3 +1,14 @@
+GET_FIELDS_FOR_OBJECT_TYPE_QUERY = '''
+query getFieldsforObjectType($object_type: String!) {
+  __type(name: $object_type) {
+    fields {
+      name
+    }
+  }
+}
+'''
+
+
 COMPUTE_VULNS_QUERY = '''
 query getComputeVulns($filter: VirtualMachinesFilterInput, $limit: Int, $startAt: String) {
   VirtualMachines(first: $limit, filter: $filter, after: $startAt) {

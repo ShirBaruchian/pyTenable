@@ -64,7 +64,7 @@ class TenableCS(APIPlatform):
     """
 
     _env_base = "TCS"
-    _ssl_verify = False
+    _ssl_verify = True
     _conv_json = True
     _base_path = 'api'
 
@@ -115,7 +115,7 @@ class TenableCS(APIPlatform):
             ... \'\'\')
         """
         return self.post("graph", json=kwargs)
-
+    
     @property
     def exports(self):
         return ExportsAPI(self)

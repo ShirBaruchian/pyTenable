@@ -76,7 +76,7 @@ class ExportsAPI(APIEndpoint):
             'filter': filters,
         }
         if return_json:
-            return self._api.query(query=query,
+            return self._api.graphql(query=query,
                                    variables=variables,
                                    **kwargs
                                    )
@@ -86,6 +86,12 @@ class ExportsAPI(APIEndpoint):
                         _variables=variables,
                         **kwargs
                         )
+
+    def _get_fields_for_type(self, object_type):
+        variables={"object_type": object_type} 
+        return self._api.graphql(
+                                query=queries.GET_FIELDS_FOR_OBJECT_TYPE_QUERY,
+                                variables=variables).json()['data']['__type']['fields']
 
     def compute_vulns(self,
                       filters: Optional[Dict] = None,
