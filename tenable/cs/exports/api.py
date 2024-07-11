@@ -87,12 +87,18 @@ class ExportsAPI(APIEndpoint):
                         **kwargs
                         )
 
-    def _get_fields_for_type(self, object_type):
-        variables={"object_type": object_type} 
+    def _get_fields_for_type(self, entity_name: str) -> list:
+        """
+        What are Docs?
+        """
+        variables={"name": entity_name} 
         return self._api.graphql(
-                                query=queries.GET_FIELDS_FOR_OBJECT_TYPE_QUERY,
+                                query=queries.GET_FIELDS_FOR_ENTITY_QUERY,
                                 variables=variables).json()['data']['__type']['fields']
-
+    
+    def _get_all_entity_types(self) -> list:
+        return self._api.graphql(
+                                query=queries.GET_ALL_ENTITY_TYPES).json()['data']['__type']['enumValues']
     def compute_vulns(self,
                       filters: Optional[Dict] = None,
                       start_at: Optional[str] = None,
@@ -136,7 +142,6 @@ class ExportsAPI(APIEndpoint):
                           )
         
     def compute_assets(self,
-                    filters: Optional[Dict] = None,
                     start_at: Optional[str] = None,
                     limit: Optional[int] = 200,
                     return_json: bool = False
@@ -144,41 +149,16 @@ class ExportsAPI(APIEndpoint):
         """
         No docs for you
         """
-        self._log.warn('The query that powers this only supports ec2 right now')
-        default_filters = {
-            'Types': [
-                'AzureDbForMariaDbServer',
-                'AwsRdsDatabaseInstance',
-                'AwsEc2Instance',
-                'AzureComputeVirtualMachine',
-                'AzureComputeVirtualMachineScaleSetVirtualMachine',
-                'GcpComputeInstance',
-                'AwsRdsDatabaseInstance',
-                'AzureClassicComputeVirtualMachine',
-                'AzureVMwareVirtualmachine',
-                'GcpSpannerDatabase',
-                'OciComputeInstance',
-                'AzureMySqlFlexibleServer',
-                'AzureMySqlSingleServer',
-                'AzurePostgreSqlFlexibleServer',
-                'AzurePostgreSqlSingleServer',
-                'AzureSqlServer',
-                'GcpSqlInstance',
-                'GcpBigtableInstance'
-            ]
-        }
+
 
         return self._list(queries.COMPUTE_ASSETS_QUERY,
                             model='Entities',
-                            filters=filters,
-                            default_filters=default_filters,
                             start_at=start_at,
                             limit=limit,
                             return_json=return_json
                         )
         
     def container_assets(self,
-                    filters: Optional[Dict] = None,
                     start_at: Optional[str] = None,
                     limit: Optional[int] = 200,
                     return_json: bool = False
@@ -186,19 +166,8 @@ class ExportsAPI(APIEndpoint):
         """
         No docs for you
         """
-        default_filters = {
-            'Types': [
-                'CiContainerImage',
-                'AwsContainerImage',
-                'AzureContainerImage',
-                'GcpContainerImage',
-                'OpContainerImage'
-            ]
-        }
         return self._list(queries.CONTAINER_ASSETS_QUERY,
                             model='Entities',
-                            filters=filters,
-                            default_filters=default_filters,
                             start_at=start_at,
                             limit=limit,
                             return_json=return_json

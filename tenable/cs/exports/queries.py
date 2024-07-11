@@ -1,6 +1,15 @@
-GET_FIELDS_FOR_OBJECT_TYPE_QUERY = '''
-query getFieldsforObjectType($object_type: String!) {
-  __type(name: $object_type) {
+GET_ALL_ENTITY_TYPES = '''
+{
+  __type(name:"EntityType"){
+    enumValues{
+      name
+    }
+  }
+}
+'''
+GET_FIELDS_FOR_ENTITY_QUERY = '''
+query getFieldsforEntity($name: String!) {
+  __type(name: $name) {
     fields {
       name
     }
@@ -133,402 +142,496 @@ query getContainerVulns($filter:ContainerImagesFilterInput,
 }
 '''
 COMPUTE_ASSETS_QUERY = '''
-query getComputeAssets($limit: Int, $startAt: String, $filter: EntitiesFilterInput) {
-  Entities(first: $limit, after: $startAt, filter: $filter) {
-    pageInfo {
-      startCursor
-      hasNextPage
-      endCursor
-    }
-    nodes {
-      ... on AwsEc2Instance {
-        CloudProvider
-        Id
-        AccountId
-        CustomFields
-        Labels
-        Tags {
-          Key
-          Value
+query getComputeAssets($limit: Int, $startAt: String){
+      Entities(first: $limit, after: $startAt, filter: {
+          Types: [
+    AwsEc2Instance
+AzureComputeVirtualMachine
+AzureComputeVirtualMachineScaleSetVirtualMachine
+GcpComputeInstance
+      ]
         }
-        LastUpdatedAt: SyncTime
-        Arn
-        CreatedAt: CreationTime
-        CreatorIdentity {
-          Id
-          AccountId
-          Name
+      ) {
+        pageInfo {
+          endCursor
         }
-        CreatorOriginator {
-          Id
-          AccountId
-          Name
+        nodes {
+          ...AwsEc2InstanceSegment
+          ...AzureComputeVirtualMachineSegment
+          ...AzureComputeVirtualMachineScaleSetVirtualMachineSegment
+          ...GcpComputeInstanceSegment
         }
-        Region
-        Stack {
-          Name
-          Id
-          AccountId
-        }
-        SecurityGroups {
-          Id
-          AccountId
-          Name
-          Arn
-          Region
-          Stack {
-            Id
-            Name
-            AccountId
-          }
-        }
-        Subnets {
-          Id
-          Name
-          AccountId
-          Arn
-          Region
-          Stack {
-            Id
-            Name
-            AccountId
-          }
-        }
-        Vpcs {
-          Id
-          AccountId
-          Name
-          Arn
-          Region
-          Stack {
-            Id
-            AccountId
-            Name
-          }
-        }
-        OperatingSystem
-        OperatingSystemType
-        ScanStatus
-        ScanStatusDescription
-        LastScannedAt: ScanTime
-        Architecture
-        CpuCores
-        InstanceType
-        Image {
-          Id
-          AccountId
-          Name
-          Arn
-        }
-        Isolated
-        LaunchTime
-        NetworkInterface {
-          Id
-          AccountId
-          Arn
-          Name
-          Region
-          SecurityGroups {
-            Id
-            Name
-            AccountId
-            Arn
-          }
-          Subnets {
-            Id
-            Name
-            AccountId
-            Arn
-            Region
-          }
-          Vpcs {
-            Id
-            Name
-            AccountId
-            Arn
-            Region
-          }
-          PrivateIpAddresses
-          PublicIpAddresses
-        }
-        Platform
-        PrivateDnsNames
-        ProductCode {
-          Id
-          Type
-        }
-        PublicIpAddressDnsNames
-        Role {
-          Id
-          Name
-          Arn
-          AccountId
-          Region
-          AccessLevel
-        }
-        RootVolume {
-          Id
-          Name
-          AccountId
-          Arn
-          EncryptionKeys {
-            Id
-            Name
-            AccountId
-          }
-          DeleteOnTermination
-          ProductCode {
-            Id
-            Type
-          }
-          RootDevice
-          Size
-          VolumeType
-        }
-        State
-      }
-      ... on AzureDbForMariaDbServer {
-        Id
-        Name
-      }
-    }
-  }
+ }
 }
+fragment AwsEc2InstanceSegment on AwsEc2Instance {
+  Id
+  AccountId
+  CloudProvider
+  CustomFields
+  Labels
+  Name
+  LastUpdatedAt: SyncTime
+  Tags {
+    Key
+    Value
+  }
+  Arn
+  CreatedAt: CreationTime
+  CreatorIdentity {
+    Id
+    Name
+    AccountId
+  }
+  CreatorOriginator {
+    Id
+    Name
+    AccountId
+  }
+  Region
+  #Stack
+  #SecurityGroups
+  Subnets {
+Id
+AccountId
+Region
+Arn
+Name
+}
+  Vpcs {
+Id
+AccountId
+Region
+Arn
+Name
+}
+  #NetworkAccess
+  OperatingSystem
+  OperatingSystemType
+  #ResolvedSoftware
+  ScanStatus
+  ScanStatusDescription
+  ScanTime
+  #Software
+  #Vulnerabilities
+  #VulnerabilityResolutionPatches
+  Architecture
+  CpuCores
+  InstanceType
+  Image {
+Id
+AccountId
+Name
+Arn
+Region
+AwsManaged
+}
+  Isolated
+  #LaunchConfiguration
+  #LaunchTemplate
+  LaunchTime
+  MetadataServiceAccessible
+  MetadataServiceVersion
+  MetadataServiceV1UsageTime
+  #NetworkInterface
+  Platform
+  PrivateDnsNames
+  PrivateIpAddresses
+  #ProductCode
+  PublicIpAddressDnsNames
+  PublicIpAddresses
+  #Role
+  RootVolume {
+Id
+AccountId
+Name
+Arn
+Region
+DeleteOnTermination
+RootDevice
+Size
+VolumeType
+}
+  State
+}
+fragment AzureComputeVirtualMachineSegment on AzureComputeVirtualMachine {
+  Id
+  AccountId
+  CloudProvider
+  CustomFields
+  Labels
+  Name
+  LastUpdatedAt: SyncTime
+  Tags {
+    Key
+    Value
+  }
+  CreatedAt: CreationTime
+  CreatorIdentity {
+    Id
+    Name
+    AccountId
+  }
+  Location
+  #RoleAssignments
+  ResourceGroupId
+  OperatingSystem
+  OperatingSystemType
+  #ResolvedSoftware
+  ScanStatus
+  ScanStatusDescription
+  ScanTime
+  #Software
+  #Vulnerabilities
+  #VulnerabilityResolutionPatches
+  PrivateIpAddresses
+   PublicIpAddressResources {
+Id
+AccountId
+Name
+IpAddress
+}
+}
+fragment AzureComputeVirtualMachineScaleSetVirtualMachineSegment on AzureComputeVirtualMachineScaleSetVirtualMachine {
+  Id
+  AccountId
+  CloudProvider
+  CustomFields
+  Labels
+  Name
+  LastUpdatedAt: SyncTime
+  Tags {
+    Key
+    Value
+  }
+  CreatedAt: CreationTime
+  CreatorIdentity {
+    Id
+    Name
+    AccountId
+  }
+  Location
+  #RoleAssignments
+  ResourceGroupId
+  OperatingSystem
+  OperatingSystemType
+  #ResolvedSoftware
+  ScanStatus
+  ScanStatusDescription
+  ScanTime
+  #Software
+  #Vulnerabilities
+  #VulnerabilityResolutionPatches
+  PrivateIpAddresses
+   PublicIpAddressResources {
+Id
+AccountId
+Name
+IpAddress
+}
+}
+fragment GcpComputeInstanceSegment on GcpComputeInstance {
+  Id
+  AccountId
+  CloudProvider
+  CustomFields
+  Labels
+  Name
+  LastUpdatedAt: SyncTime
+  Tags {
+    Key
+    Value
+  }
+  CreatedAt: CreationTime
+  CreatorIdentity {
+    Id
+    Name
+    AccountId
+  }
+  CreatorOriginator {
+    Id
+    Name
+    AccountId
+  }
+  Location
+  AccessLevel
+  #RoleBindings
+  #NetworkAccess
+  OperatingSystem
+  OperatingSystemType
+  #ResolvedSoftware
+  ScanStatus
+  ScanStatusDescription
+  ScanTime
+  #Software
+  #Vulnerabilities
+  #VulnerabilityResolutionPatches
+  PrivateIpAddresses
+  PublicIpAddresses
+}
+
 '''
 
 CONTAINER_ASSETS_QUERY = '''
-query getContainerAssets($limit: Int, $startAt: String, $filter: EntitiesFilterInput) {
-  Entities(first: $limit, after: $startAt, filter: $filter) {
-    pageInfo {
-      startCursor
-      hasNextPage
-      endCursor
-    }
-    nodes {
-      ... on AwsContainerImage {
-        LastScanTime: ScanTime
-        Id
-        AccountId
-        CloudProvider
-        Region
-        Arn
-        CreatedAt: CreationTime
-        CreatorIdentity {
-          Name
-          Id
-          AccountId
+query getContainerAssets($limit: Int, $startAt: String){
+        Entities(first: $limit, after: $startAt, filter: {
+            Types: [
+        AwsContainerImage
+AzureContainerImage
+CiContainerImage
+GcpContainerImage
+OpContainerImage
+      ]
+            }
+        ) {
+            pageInfo {
+            endCursor
+            }
+            nodes {
+          ...AwsContainerImageSegment
+          ...AzureContainerImageSegment
+          ...CiContainerImageSegment
+          ...GcpContainerImageSegment
+          ...OpContainerImageSegment
         }
-        CreatorOriginator {
-          Name
-          Id
-          AccountId
-        }
-        Stack {
-          Name
-          AccountId
-          Id
-        }
-        CustomFields
-        Labels
-        Tags {
-          Key
-          Value
-        }
-        Name
-        LastUpdatedAt: SyncTime
-        Clusters {
-          Name
-          AccountId
-          Id
-          CloudProvider
-        }
-        Digest
-        KubernetesWorkloads {
-          CloudProvider
-          Name
-          AccountId
-          Id
-        }
-        OperatingSystem
-        OperatingSystemType
-        Repository {
-          CloudProvider
-          Name
-          AccountId
-          Id
-        }
-        RepositoryUri
-        Used
-      }
-      ... on CiContainerImage {
-        LastScanTime: ScanTime
-        Id
-        AccountId
-        CloudProvider
-        CustomFields
-        Labels
-        Tags {
-          Key
-          Value
-        }
-        Name
-        Clusters {
-          Name
-          AccountId
-          Id
-          CloudProvider
-        }
-        Digest
-        KubernetesWorkloads {
-          CloudProvider
-          Name
-          AccountId
-          Id
-        }
-        OperatingSystem
-        OperatingSystemType
-        Repository {
-          CloudProvider
-          Name
-          AccountId
-          Id
-        }
-        RepositoryUri
-        LastUpdatedAt: SyncTime
-        Used
-      }
-      ... on AzureContainerImage {
-        LastScanTime: ScanTime
-        Id
-        AccountId
-        CloudProvider
-        CreationTime
-        CreatorIdentity {
-          Name
-          AccountId
-          Id
-        }
-        Location
-        CustomFields
-        Labels
-        Tags {
-          Key
-          Value
-        }
-        Name
-        CreatedAt: CreationTime
-        Clusters {
-          Name
-          AccountId
-          Id
-          CloudProvider
-        }
-        Digest
-        KubernetesWorkloads {
-          CloudProvider
-          Name
-          AccountId
-          Id
-        }
-        OperatingSystem
-        OperatingSystemType
-        Repository {
-          CloudProvider
-          Name
-          AccountId
-          Id
-        }
-        RepositoryUri
-        LastUpdatedAt: SyncTime
-        Used
-      }
-      ... on GcpContainerImage {
-        LastScanTime: ScanTime
-        Id
-        AccountId
-        CloudProvider
-        CreatedAt: CreationTime
-        CreatorIdentity {
-          Id
-          AccountId
-          Name
-        }
-        CreatorOriginator {
-          Id
-          Name
-          AccountId
-        }
-        Location
-        CustomFields
-        Labels
-        Tags {
-          Key
-          Value
-        }
-        Name
-        Clusters {
-          Name
-          AccountId
-          Id
-          CloudProvider
-        }
-        Digest
-        KubernetesWorkloads {
-          CloudProvider
-          Name
-          AccountId
-          Id
-        }
-        OperatingSystem
-        OperatingSystemType
-        Repository {
-          CloudProvider
-          Name
-          AccountId
-          Id
-        }
-        RepositoryUri
-        LastUpdatedAt: SyncTime
-        Used
-      }
-      ... on OpContainerImage {
-        LastScanTime: ScanTime
-        Id
-        AccountId
-        CloudProvider
-        CustomFields
-        Labels
-        Tags {
-          Key
-          Value
-        }
-        Name
-        Clusters {
-          Name
-          AccountId
-          Id
-          CloudProvider
-        }
-        Digest
-        KubernetesWorkloads {
-          CloudProvider
-          Name
-          AccountId
-          Id
-        }
-        OperatingSystem
-        OperatingSystemType
-        Repository {
-          CloudProvider
-          Name
-          AccountId
-          Id
-        }
-        RepositoryUri
-        LastUpdatedAt: SyncTime
-        Used
-      }
-    }
-  }
+ }
 }
+fragment AwsContainerImageSegment on AwsContainerImage {
+  Id
+  AccountId
+  CloudProvider
+  CustomFields
+  Labels
+  Name
+  LastUpdatedAt: SyncTime
+  Tags {
+    Key
+    Value
+  }
+  Arn
+  CreatedAt: CreationTime
+  CreatorIdentity {
+    Id
+    Name
+    AccountId
+  }
+  CreatorOriginator {
+    Id
+    Name
+    AccountId
+  }
+  Region
+  #Stack
+  Clusters {
+Name
+AccountId
+Id
+}
+  Digest
+  KubernetesWorkloads {
+Name
+AccountId
+Id
+}
+  OperatingSystem
+  OperatingSystemType
+  Repository {
+Name
+AccountId
+Id
+}
+  RepositoryUri
+  ScanTime
+  #Software
+  Used
+  VirtualMachines {
+Name
+AccountId
+Id
+}
+  #Vulnerabilities
+}
+fragment AzureContainerImageSegment on AzureContainerImage {
+  Id
+  AccountId
+  CloudProvider
+  CustomFields
+  Labels
+  Name
+  LastUpdatedAt: SyncTime
+  Tags {
+    Key
+    Value
+  }
+  CreatedAt: CreationTime
+  CreatorIdentity {
+    Id
+    Name
+    AccountId
+  }
+  Location
+  Clusters {
+Name
+AccountId
+Id
+}
+  Digest
+  KubernetesWorkloads {
+Name
+AccountId
+Id
+}
+  OperatingSystem
+  OperatingSystemType
+  Repository {
+Name
+AccountId
+Id
+}
+  RepositoryUri
+  ScanTime
+  #Software
+  Used
+  VirtualMachines {
+Name
+AccountId
+Id
+}
+  #Vulnerabilities
+}
+fragment CiContainerImageSegment on CiContainerImage {
+  Id
+  AccountId
+  CloudProvider
+  CustomFields
+  Labels
+  Name
+  LastUpdatedAt: SyncTime
+  Tags {
+    Key
+    Value
+  }
+  Clusters {
+Name
+AccountId
+Id
+}
+  Digest
+  KubernetesWorkloads {
+Name
+AccountId
+Id
+}
+  OperatingSystem
+  OperatingSystemType
+  Repository {
+Name
+AccountId
+Id
+}
+  RepositoryUri
+  ScanTime
+  #Software
+  Used
+  VirtualMachines {
+Name
+AccountId
+Id
+}
+  #Vulnerabilities
+}
+fragment GcpContainerImageSegment on GcpContainerImage {
+  Id
+  AccountId
+  CloudProvider
+  CustomFields
+  Labels
+  Name
+  LastUpdatedAt: SyncTime
+  Tags {
+    Key
+    Value
+  }
+  CreatedAt: CreationTime
+  CreatorIdentity {
+    Id
+    Name
+    AccountId
+  }
+  CreatorOriginator {
+    Id
+    Name
+    AccountId
+  }
+  Location
+  Clusters {
+Name
+AccountId
+Id
+}
+  Digest
+  KubernetesWorkloads {
+Name
+AccountId
+Id
+}
+  OperatingSystem
+  OperatingSystemType
+  Repository {
+Name
+AccountId
+Id
+}
+  RepositoryUri
+  ScanTime
+  #Software
+  Used
+  VirtualMachines {
+Name
+AccountId
+Id
+}
+  #Vulnerabilities
+}
+fragment OpContainerImageSegment on OpContainerImage {
+  Id
+  AccountId
+  CloudProvider
+  CustomFields
+  Labels
+  Name
+  LastUpdatedAt: SyncTime
+  Tags {
+    Key
+    Value
+  }
+  Clusters {
+Name
+AccountId
+Id
+}
+  Digest
+  KubernetesWorkloads {
+Name
+AccountId
+Id
+}
+  OperatingSystem
+  OperatingSystemType
+  Repository {
+Name
+AccountId
+Id
+}
+  RepositoryUri
+  ScanTime
+  #Software
+  Used
+  VirtualMachines {
+Name
+AccountId
+Id
+}
+  #Vulnerabilities
+}
+
 '''
