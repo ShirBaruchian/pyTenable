@@ -36,7 +36,7 @@ setup(
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
     ],
-    keywords="tenable tenable_io securitycenter containersecurity",
+    keywords="tenable tenable_io securitycenter containersecurity cloudsecurity identityexposure attackpathanalysis",
     packages=find_packages(exclude=["docs", "tests", "tests.*"]),
     install_requires=[
         'requests>=2.26',
