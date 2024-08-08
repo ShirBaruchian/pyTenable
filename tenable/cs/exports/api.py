@@ -87,18 +87,6 @@ class ExportsAPI(APIEndpoint):
                         **kwargs
                         )
 
-    def _get_fields_for_type(self, entity_name: str) -> list:
-        """
-        What are Docs?
-        """
-        variables={"name": entity_name} 
-        return self._api.graphql(
-                                query=queries.GET_FIELDS_FOR_ENTITY_QUERY,
-                                variables=variables).json()['data']['__type']['fields']
-    
-    def _get_all_entity_types(self) -> list:
-        return self._api.graphql(
-                                query=queries.GET_ALL_ENTITY_TYPES).json()['data']['__type']['enumValues']
     def compute_vulns(self,
                       filters: Optional[Dict] = None,
                       start_at: Optional[str] = None,
@@ -144,7 +132,7 @@ class ExportsAPI(APIEndpoint):
     def compute_assets(self,
                     start_at: Optional[str] = None,
                     limit: Optional[int] = 200,
-                    return_json: bool = False
+                    return_json: Optional[bool] = False
                     ) -> Union[CloudSecExportIterator, Dict]:
         """
         No docs for you
