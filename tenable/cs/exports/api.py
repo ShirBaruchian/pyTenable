@@ -21,7 +21,7 @@ class ExportsAPI(APIEndpoint):
     def _list(self,
               query: str,
               model: str,
-              limit: int = 200,
+              limit: int,
               return_json: bool = False,
               filters: Optional[Dict] = None,
               default_filters: Optional[Dict] = None,
@@ -90,14 +90,15 @@ class ExportsAPI(APIEndpoint):
     def compute_vulns(self,
                       filters: Optional[Dict] = None,
                       start_at: Optional[str] = None,
-                      limit: Optional[int] = 200,
+                      limit: Optional[int] = 10,
                       return_json: bool = False
                       ) -> Union[CloudSecExportIterator, Dict]:
         """
         No docs for you
         """
         default_filters = {
-            'VulnerabilitySeverities': ['Critical', 'High', 'Medium', 'Low', 'Informational'],
+            'VulnerabilitySeverities': ['Critical', 'High', 'Medium', 'Low'],
+            #'VulnerabilitySeverities': ['Critical', 'High', 'Medium', 'Low', 'Informational'],
         }
         return self._list(queries.COMPUTE_VULNS_QUERY,
                           model='VirtualMachines',
@@ -111,14 +112,15 @@ class ExportsAPI(APIEndpoint):
     def container_vulns(self,
                       filters: Optional[Dict] = None,
                       start_at: Optional[str] = None,
-                      limit: Optional[int] = 200,
+                      limit: Optional[int] = 10,
                       return_json: bool = False
                       ) -> Union[CloudSecExportIterator, Dict]:
         """
         No docs for you
         """
         default_filters = {
-            'VulnerabilitySeverities': ['Critical', 'High', 'Medium', 'Low', 'Informational'],
+            'VulnerabilitySeverities': ['Critical', 'High', 'Medium', 'Low' ],
+            #'VulnerabilitySeverities': ['Critical', 'High', 'Medium', 'Low', 'Informational'],
         }
         return self._list(queries.CONTAINER_VULNS_QUERY,
                           model='ContainerImages',
@@ -131,7 +133,7 @@ class ExportsAPI(APIEndpoint):
         
     def compute_assets(self,
                     start_at: Optional[str] = None,
-                    limit: Optional[int] = 200,
+                    limit: Optional[int] = 1000,
                     return_json: Optional[bool] = False
                     ) -> Union[CloudSecExportIterator, Dict]:
         """
@@ -148,7 +150,7 @@ class ExportsAPI(APIEndpoint):
         
     def container_assets(self,
                     start_at: Optional[str] = None,
-                    limit: Optional[int] = 200,
+                    limit: Optional[int] = 1000,
                     return_json: bool = False
                     ) -> Union[CloudSecExportIterator, Dict]:
         """
